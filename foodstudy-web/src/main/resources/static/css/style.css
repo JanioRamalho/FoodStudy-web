@@ -1,135 +1,98 @@
-/* -----------------------------------------------------
-   ESTILO PROFISSIONAL - TEMA ALARANJADO FOODSTUDY
------------------------------------------------------- */
 
-/* Paleta principal */
 :root {
-    --cor-primaria: #ff7f27;   /* laranja vibrante */
-    --cor-secundaria: #4CAF50; /* verde FoodStudy */
-    --cor-escura: #333;
-    --cor-clara: #fff;
-    --cor-fundo: #fdf7f2;
+    --primaria: #ff7a29;
+    --branco: #fff;
+    --texto: #f5f5f5;
 }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    background: var(--cor-fundo);
-    margin: 0;
     font-family: 'Poppins', sans-serif;
-    overflow-x: hidden;
-}
-
-/* Navbar */
-.navbar {
-    background: var(--cor-primaria);
-}
-
-.navbar-brand {
-    color: white !important;
-    font-size: 1.6rem;
-    font-weight: 700;
-}
-
-.nav-link {
-    color: white !important;
-    font-weight: 500;
-}
-
-/* Header Hero Section */
-.hero {
+    height: 100vh;
+    color: var(--texto);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 80px 10%;
+    justify-content: center;
+    overflow: hidden;
 }
 
-.hero-text {
-    max-width: 50%;
+/* FUNDO COM IMAGEM DO HAMBÚRGUER */
+.fundo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
+        url('/img/pexels-janamthapa-11829700.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
 }
 
-.hero-text h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--cor-escura);
-}
-
-.hero-text span {
-    color: var(--cor-primaria);
-}
-
-.hero-text p {
-    color: #555;
-    font-size: 1.1rem;
-    margin-top: 10px;
-}
-
-.hero-btn {
-    margin-top: 30px;
-}
-
-.hero-btn a {
-    padding: 15px 35px;
-    background: var(--cor-primaria);
-    color: white;
-    border-radius: 40px;
-    font-size: 1.1rem;
-    text-decoration: none;
-    font-weight: 600;
-    transition: 0.3s;
-}
-
-.hero-btn a:hover {
-    background: #e46d1e;
-    transform: scale(1.05);
-}
-
-/* Hero Ilustração */
-.hero img {
-    width: 45%;
-    animation: flutuar 4s ease-in-out infinite;
-}
-
-@keyframes flutuar {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-12px);}
-    100% { transform: translateY(0px); }
-}
-
-/* Seção de Destaques */
-.features {
-    padding: 80px 10%;
+/* CARD CENTRAL */
+.container-app {
+    max-width: 380px;
     text-align: center;
-}
-
-.features h2 {
-    font-size: 2.3rem;
-    font-weight: 800;
-    margin-bottom: 40px;
-    color: var(--cor-escura);
-}
-
-.feature-card {
-    background: white;
-    border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 7px 20px rgba(0,0,0,0.1);
-    transition: 0.3s;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.15);
 }
 
-.feature-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+.logo {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--branco);
+    margin-bottom: 10px;
 }
 
-.feature-icon {
-    font-size: 3rem;
-    color: var(--cor-primaria);
+.subtitulo {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-bottom: 25px;
 }
 
-/* Rodapé */
-footer {
-    background: var(--cor-escura);
-    padding: 20px;
-    text-align: center;
+.btn-app {
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.btn-primario {
+    background: var(--primaria);
     color: white;
-    margin-top: 60px;
+}
+.btn-primario:hover {
+    background: #e06720;
+}
+
+.btn-secundario {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+.btn-secundario:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.link-menor {
+    margin-top: 18px;
+    display: block;
+    font-size: 0.9rem;
+    color: var(--branco);
+    opacity: 0.85;
+    text-decoration: none;
+}
+.link-menor:hover {
+    text-decoration: underline;
 }

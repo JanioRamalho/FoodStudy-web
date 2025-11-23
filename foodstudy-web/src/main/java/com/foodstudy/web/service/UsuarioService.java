@@ -1,62 +1,72 @@
 package com.foodstudy.web.service;
 
+import com.foodstudy.web.model.Pedido;
 import com.foodstudy.web.model.Usuario;
-import com.foodstudy.web.model.FoodCash;
 import com.foodstudy.web.repository.UsuarioRepository;
-import com.foodstudy.web.repository.FoodCashRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final FoodCashRepository foodCashRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository,
-                          FoodCashRepository foodCashRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
-        this.foodCashRepository = foodCashRepository;
     }
 
-    // Criar novo usuário
-    public Usuario cadastrar(Usuario usuario) {
+    // ========= MÉTODOS USADOS PELO UsuarioController =========
 
-        // Criar FoodCash automaticamente para o usuário
-        FoodCash foodCash = new FoodCash();
-        foodCash.setSaldo(0f);
-        foodCash.setUsuario(usuario);
-
-        usuario.setFoodCash(foodCash);
-
-        // Salvar usuário (e FoodCash por cascata)
-        return usuarioRepository.save(usuario);
-    }
-
-    // Retornar TODOS os usuários
+    // 1. Listar todos os usuários
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
 
-    // Buscar usuário por ID
+    // 2. Buscar usuário por ID
     public Usuario buscarPorId(Long id) {
-        return usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Optional<Usuario> opt = usuarioRepository.findById(id);
+        return opt.orElse(null);
     }
 
-    // Adicionar saldo ao usuário
+    // 3. Cadastrar novo usuário (API)
+    public Usuario cadastrar(Usuario usuario) {
+        return usuarioRepository.save(usuario);
+    }
+
+    // 4. Adicionar saldo ao FoodCash do usuário
     public void adicionarFoodCash(Long usuarioId, float valor) {
         Usuario usuario = buscarPorId(usuarioId);
-        FoodCash wallet = usuario.getFoodCash();
-
-        wallet.adicionar(valor);
-        foodCashRepository.save(wallet);
+        if (usuario != null) {
+            usuario.adicionarFoodCash(valor); // usa o método da própria entidade
+            usuarioRepository.save(usuario);
+        }
     }
 
-    // Visualizar pedidos do usuário
-    public List<?> visualizarPedidos(Long usuarioId) {
+    // 5. Visualizar pedidos de um usuário
+    public List<Pedido> visualizarPedidos(Long usuarioId) {
         Usuario usuario = buscarPorId(usuarioId);
-        return usuario.getPedidos();
+        if (usuario != null) {
+            return usuario.getPedidos();
+        }
+        return List.of();
+    }
+
+    // ========= MÉTODOS USADOS PELO AuthController (LOGIN / CADASTRO TELA INDEX) =========
+
+    // usado na tela de cadastro (/register)
+    public Usuario registrar(Usuario usuario) {
+        // aqui poderia validar se o email já existe, se quiser
+        return usuarioRepository.save(usuario);
+    }
+
+    // usado no login (/login)
+    public Usuario autenticar(String email, String senha) {
+        Usuario user = usuarioRepository.findByEmail(email);
+        if (user != null && user.getSenha() != null && user.getSenha().equals(senha)) {
+            return user;
+        }
+        return null; // login inválido
     }
 }

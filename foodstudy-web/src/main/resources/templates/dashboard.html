@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Food Study</title>
+    
+    <!-- Fonte Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuração de cores personalizadas -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            light: '#FFF6E8', 
+                            DEFAULT: '#FF6B2B', 
+                            dark: '#E65100', 
+                            gradient: '#FF8C42'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-brand-light text-gray-700 h-screen flex overflow-hidden">
+
+    <!-- SIDEBAR (Visível apenas em telas grandes MD+) -->
+    <aside class="hidden md:flex flex-col w-64 bg-white h-full shadow-lg z-20">
+        <div class="p-8 flex items-center justify-center border-b border-gray-100">
+            <div class="w-10 h-10 bg-brand text-white rounded-full flex items-center justify-center text-xl mr-3 shadow-md">
+                <i class="fa-solid fa-book-open"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-brand">Food Study</h1>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-2">
+            <a href="#" class="flex items-center gap-4 px-4 py-3 bg-brand-light text-brand font-semibold rounded-xl transition-all">
+                <i class="fa-solid fa-store"></i> <!-- Ícone alterado para Store -->
+                <span>Restaurantes</span>
+            </a>
+            <a href="#" class="flex items-center gap-4 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-brand rounded-xl transition-all">
+                <i class="fa-solid fa-heart"></i>
+                <span>Favoritos</span>
+            </a>
+            <a href="#" class="flex items-center gap-4 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-brand rounded-xl transition-all">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Meus Pedidos</span>
+            </a>
+            <a href="#" class="flex items-center gap-4 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-brand rounded-xl transition-all">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Carteira</span>
+            </a>
+        </nav>
+
+        <div class="p-6 border-t border-gray-100">
+            <div class="bg-brand rounded-2xl p-4 text-white text-center relative overflow-hidden shadow-lg shadow-brand/30">
+                <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 bg-white opacity-20 rounded-full"></div>
+                <h4 class="font-bold text-lg mb-1">Indique Amigos</h4>
+                <p class="text-xs opacity-90 mb-3">Ganhe cupom de R$10 em qualquer restaurante.</p>
+                <button class="bg-white text-brand text-xs font-bold py-2 px-4 rounded-lg w-full">Convidar</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 h-full overflow-y-auto relative w-full">
+        <!-- Header -->
+        <header class="sticky top-0 bg-brand-light/95 backdrop-blur-sm z-10 px-6 py-4 flex justify-between items-center">
+            <div class="md:hidden text-brand text-xl">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+
+            <div class="hidden md:flex flex-1 max-w-lg mx-8 relative">
+                <input type="text" placeholder="Busque por restaurante ou prato..." class="w-full pl-12 pr-4 py-3 rounded-2xl border-none outline-none shadow-sm focus:shadow-md transition-shadow bg-white text-sm">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="relative bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition text-gray-600">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                </button>
+                
+                <div class="flex items-center gap-3 bg-white p-1.5 pr-4 rounded-xl shadow-sm cursor-pointer hover:shadow-md transition">
+                    <img src="https://ui-avatars.com/api/?name=User+Name&background=FF6B2B&color=fff" alt="User" class="w-8 h-8 rounded-lg">
+                    <span class="text-sm font-semibold hidden sm:block">Olá, João</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="px-6 pb-24 md:pb-6 max-w-7xl mx-auto">
+            
+            <!-- Mobile Search -->
+            <div class="md:hidden mt-2 mb-6 relative">
+                <input type="text" placeholder="Buscar restaurante..." class="w-full pl-12 pr-4 py-3 rounded-2xl border-none outline-none shadow-sm bg-white text-sm">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+
+            <!-- Banner Promo -->
+            <div class="w-full bg-gradient-to-r from-brand to-brand-gradient rounded-3xl p-6 md:p-10 mb-8 text-white relative overflow-hidden shadow-lg shadow-brand/20 flex items-center justify-between">
+                <div class="z-10 max-w-md">
+                    <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-semibold mb-3 inline-block">Novidade no Campus</span>
+                    <h2 class="text-2xl md:text-4xl font-bold mb-2">Cantina Central Reformada!</h2>
+                    <p class="text-sm md:text-base opacity-90 mb-6">Venha conhecer o novo espaço de estudos e café.</p>
+                    <button class="bg-white text-brand font-bold py-2.5 px-6 rounded-xl shadow-lg hover:scale-105 transition-transform text-sm">Ver Local</button>
+                </div>
+                <div class="hidden sm:block text-9xl absolute -right-4 -bottom-8 opacity-20 rotate-12">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="mb-8">
+                <div class="flex justify-between items-end mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">Filtrar por Tipo</h3>
+                </div>
+                
+                <div class="flex gap-4 overflow-x-auto hide-scroll pb-2" id="category-container">
+                    <button class="flex flex-col items-center gap-2 min-w-[80px] group">
+                        <div class="w-16 h-16 bg-brand text-white rounded-2xl flex items-center justify-center text-2xl shadow-md shadow-brand/30 transition-transform group-hover:scale-110">
+                            <i class="fa-solid fa-utensils"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-brand">Todos</span>
+                    </button>
+
+                    <button class="flex flex-col items-center gap-2 min-w-[80px] group">
+                        <div class="w-16 h-16 bg-white text-gray-400 rounded-2xl flex items-center justify-center text-2xl shadow-sm transition-transform group-hover:scale-110 group-hover:text-brand group-hover:shadow-md">
+                            <i class="fa-solid fa-mug-hot"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-500 group-hover:text-brand">Cafeterias</span>
+                    </button>
+
+                    <button class="flex flex-col items-center gap-2 min-w-[80px] group">
+                        <div class="w-16 h-16 bg-white text-gray-400 rounded-2xl flex items-center justify-center text-2xl shadow-sm transition-transform group-hover:scale-110 group-hover:text-brand group-hover:shadow-md">
+                            <i class="fa-solid fa-burger"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-500 group-hover:text-brand">Lanchonetes</span>
+                    </button>
+
+                    <button class="flex flex-col items-center gap-2 min-w-[80px] group">
+                        <div class="w-16 h-16 bg-white text-gray-400 rounded-2xl flex items-center justify-center text-2xl shadow-sm transition-transform group-hover:scale-110 group-hover:text-brand group-hover:shadow-md">
+                            <i class="fa-solid fa-leaf"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-500 group-hover:text-brand">Saudável</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Restaurant Grid -->
+            <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Restaurantes e Cantinas</h3>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    
+                    <!-- Restaurante 1 -->
+                    <div class="bg-white p-4 rounded-3xl shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer" onclick="openMenu('Cantina do Bloco C')">
+                        <div class="w-full h-40 bg-gray-100 rounded-2xl mb-4 relative overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Cafe">
+                            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg shadow-sm text-xs font-bold text-green-600 flex items-center gap-1">
+                                <i class="fa-solid fa-circle text-[8px]"></i> Aberto
+                            </div>
+                            <div class="absolute bottom-3 left-3 bg-white px-2 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
+                                <i class="fa-solid fa-star text-yellow-400"></i> 4.8
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="font-bold text-gray-800 text-lg">Cantina do Bloco C</h4>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">Cafés, Salgados e Bolos • 5-10 min</p>
+                        
+                        <button class="w-full py-2 bg-gray-50 text-brand text-sm font-bold rounded-xl group-hover:bg-brand group-hover:text-white transition-colors">
+                            Ver Cardápio
+                        </button>
+                    </div>
+
+                    <!-- Restaurante 2 -->
+                    <div class="bg-white p-4 rounded-3xl shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer" onclick="openMenu('Burger Point')">
+                        <div class="w-full h-40 bg-gray-100 rounded-2xl mb-4 relative overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Burger">
+                            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg shadow-sm text-xs font-bold text-green-600 flex items-center gap-1">
+                                <i class="fa-solid fa-circle text-[8px]"></i> Aberto
+                            </div>
+                            <div class="absolute bottom-3 left-3 bg-white px-2 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
+                                <i class="fa-solid fa-star text-yellow-400"></i> 4.5
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg mb-1">Burger Point</h4>
+                        <p class="text-xs text-gray-500 mb-4">Hambúrgueres e Batatas • 15-20 min</p>
+                        <button class="w-full py-2 bg-gray-50 text-brand text-sm font-bold rounded-xl group-hover:bg-brand group-hover:text-white transition-colors">
+                            Ver Cardápio
+                        </button>
+                    </div>
+
+                     <!-- Restaurante 3 -->
+                     <div class="bg-white p-4 rounded-3xl shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer" onclick="openMenu('Green Station')">
+                        <div class="w-full h-40 bg-gray-100 rounded-2xl mb-4 relative overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Salad">
+                            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg shadow-sm text-xs font-bold text-green-600 flex items-center gap-1">
+                                <i class="fa-solid fa-circle text-[8px]"></i> Aberto
+                            </div>
+                            <div class="absolute bottom-3 left-3 bg-white px-2 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
+                                <i class="fa-solid fa-star text-yellow-400"></i> 4.9
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg mb-1">Green Station</h4>
+                        <p class="text-xs text-gray-500 mb-4">Saladas, Wraps e Sucos • 10-15 min</p>
+                        <button class="w-full py-2 bg-gray-50 text-brand text-sm font-bold rounded-xl group-hover:bg-brand group-hover:text-white transition-colors">
+                            Ver Cardápio
+                        </button>
+                    </div>
+
+                    <!-- Restaurante 4 -->
+                    <div class="bg-white p-4 rounded-3xl shadow-sm hover:shadow-lg transition-all duration-300 group cursor-pointer opacity-80" onclick="showToast('Este restaurante está fechado.', 'error')">
+                        <div class="w-full h-40 bg-gray-100 rounded-2xl mb-4 relative overflow-hidden grayscale">
+                            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Pizza">
+                            <div class="absolute top-3 right-3 bg-red-100 px-2 py-1 rounded-lg shadow-sm text-xs font-bold text-red-500 flex items-center gap-1">
+                                <i class="fa-solid fa-clock text-[8px]"></i> Fechado
+                            </div>
+                            <div class="absolute bottom-3 left-3 bg-white px-2 py-1 rounded-lg text-xs font-bold shadow-sm flex items-center gap-1">
+                                <i class="fa-solid fa-star text-yellow-400"></i> 4.7
+                            </div>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-lg mb-1">Pizza & Pasta</h4>
+                        <p class="text-xs text-gray-500 mb-4">Italiana e Massas • Abre às 18h</p>
+                        <button class="w-full py-2 bg-gray-100 text-gray-400 text-sm font-bold rounded-xl cursor-not-allowed">
+                            Fechado Agora
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FLOATING CART BUTTON -->
+    <div class="fixed bottom-24 md:bottom-8 right-6 z-30">
+        <button class="bg-gray-900 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition flex items-center gap-3 group relative">
+            <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white transform scale-0 transition-transform">0</span>
+            <i class="fa-solid fa-basket-shopping"></i>
+            <span class="font-bold pr-1 hidden md:block">Sacola</span>
+        </button>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <div class="fixed bottom-0 left-0 w-full bg-white shadow-[0_-5px_20px_rgba(0,0,0,0.05)] py-3 px-6 flex justify-between items-center md:hidden z-20 rounded-t-3xl">
+        <a href="#" class="flex flex-col items-center text-brand gap-1">
+            <i class="fa-solid fa-store text-xl"></i>
+            <span class="text-[10px] font-medium">Início</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-gray-400 hover:text-brand gap-1 transition">
+            <i class="fa-solid fa-magnifying-glass text-xl"></i>
+            <span class="text-[10px] font-medium">Busca</span>
+        </a>
+        <div class="w-12"></div> 
+        <a href="#" class="flex flex-col items-center text-gray-400 hover:text-brand gap-1 transition">
+            <i class="fa-solid fa-receipt text-xl"></i>
+            <span class="text-[10px] font-medium">Pedidos</span>
+        </a>
+        <a href="#" class="flex flex-col items-center text-gray-400 hover:text-brand gap-1 transition">
+            <i class="fa-regular fa-user text-xl"></i>
+            <span class="text-[10px] font-medium">Perfil</span>
+        </a>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed top-20 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <script>
+        function openMenu(restaurantName) {
+            showToast(`Abrindo cardápio de ${restaurantName}...`, "info");
+            // Aqui entraria a lógica de navegação real
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const icon = type === 'info' ? 'fa-spinner fa-spin' : (type === 'error' ? 'fa-circle-xmark' : 'fa-circle-check');
+            const colorClass = type === 'info' ? 'text-blue-500' : (type === 'error' ? 'text-red-500' : 'text-green-500');
+            const borderClass = type === 'info' ? 'border-blue-500' : (type === 'error' ? 'border-red-500' : 'border-green-500');
+
+            const toast = document.createElement('div');
+            toast.className = `toast-enter bg-white border-l-4 ${borderClass} text-gray-700 px-6 py-4 rounded-lg shadow-xl flex items-center gap-3 min-w-[300px] pointer-events-auto`;
+            
+            toast.innerHTML = `
+                <div class="${colorClass} text-lg"><i class="fa-solid ${icon}"></i></div>
+                <div>
+                    <p class="text-sm font-medium">${message}</p>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

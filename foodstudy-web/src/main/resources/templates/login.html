@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Login - FoodStudy</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Ícones -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Fonte -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* ------------------------------
+           🎨 MODO ESCURO — Premium Laranja
+        --------------------------------*/
+        body.dark {
+            background: radial-gradient(circle at 20% 20%, rgba(255,120,20,0.35), transparent 55%),
+                        radial-gradient(circle at 80% 80%, rgba(255,90,0,0.25), transparent 60%),
+                        linear-gradient(135deg, #0d0d0f, #191716, #0f0f0f);
+        }
+
+        body.dark .glass-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,120,20,0.25);
+            backdrop-filter: blur(16px);
+            box-shadow:
+                0 0 25px rgba(255,120,20,0.25),
+                inset 0 0 25px rgba(255,255,255,0.04);
+        }
+
+        body.dark .input-field {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,120,20,0.22);
+        }
+
+        body.dark .btn-login {
+            background: linear-gradient(135deg, #ff7a29, #ff5e00);
+            box-shadow: 0 10px 30px rgba(255,120,20,0.35);
+        }
+
+        body.dark .btn-login:hover {
+            box-shadow: 0 14px 35px rgba(255,120,20,0.55);
+        }
+
+        /* Halos */
+        .halo {
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, rgba(255,115,40,0.35), transparent);
+            filter: blur(95px);
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        body.dark .halo { opacity: 1; }
+
+        /* ------------------------------
+           🏵️ MODO CLARO — Branco + Laranja Premium
+        --------------------------------*/
+        body.light {
+            background: linear-gradient(135deg, #ffffff, #fff7f2);
+        }
+
+        body.light .glass-card {
+            background: #ffffff;
+            border: 1px solid #ffe0c2;
+            box-shadow:
+                    0 8px 25px rgba(255,120,20,0.18),
+                    inset 0 0 15px rgba(255,150,70,0.05);
+        }
+
+        body.light .input-field {
+            background: #fff3e8;
+            border: 1px solid #ffc399;
+        }
+
+        body.light .input-field:hover {
+            background: #ffe9d6;
+        }
+
+        body.light .btn-login {
+            background: linear-gradient(135deg, #ff7a29, #ff6a00);
+            box-shadow: 0 8px 20px rgba(255,120,20,0.3);
+        }
+
+        body.light .btn-login:hover {
+            box-shadow: 0 12px 30px rgba(255,120,20,0.45);
+        }
+
+        /* Animação */
+        .glass-card {
+            animation: rise 0.8s ease-out;
+        }
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body class="light flex items-center justify-center px-6 py-16 relative">
+
+    <!-- Halos para modo escuro -->
+    <div class="halo" style="top:-120px; left:-150px;"></div>
+    <div class="halo" style="bottom:-140px; right:-100px;"></div>
+
+    <!-- Botão de modo claro/escuro -->
+    <button id="toggleTheme"
+        class="absolute top-6 right-6 bg-white/30 dark:bg-black/30 backdrop-blur-md 
+               p-3 rounded-full shadow-md cursor-pointer hover:scale-105 transition z-20">
+
+        <i data-lucide="sun" class="w-6 h-6 text-orange-400" id="themeIcon"></i>
+    </button>
+
+    <!-- CARD -->
+    <div class="glass-card rounded-3xl p-10 w-full max-w-md text-center relative z-10">
+
+        <h1 class="text-4xl font-extrabold mb-1 tracking-wider text-orange-500">
+            FoodStudy
+        </h1>
+
+        <p class="text-gray-600 dark:text-gray-300 mb-7 text-sm">
+            Faça login para continuar
+        </p>
+
+        <!-- ERRO -->
+        <p th:if="${erro}"
+           th:text="${erro}"
+           class="mb-4 text-center text-sm font-semibold text-red-500 bg-red-100 dark:bg-red-900/20 py-2 rounded-lg">
+        </p>
+
+        <!-- FORM -->
+        <form th:action="@{/login}" method="post" th:object="${usuario}" class="space-y-6">
+
+            <!-- Email -->
+            <div class="text-left text-gray-700 dark:text-gray-200 font-semibold">Email</div>
+            <div class="flex items-center rounded-xl px-4 py-3 input-field">
+                <i data-lucide="mail" class="w-5 h-5 text-orange-500"></i>
+                <input type="email" th:field="*{email}" placeholder="seuemail@exemplo.com"
+                       class="ml-3 flex-1 bg-transparent outline-none text-gray-700 dark:text-gray-100 placeholder-gray-400"
+                       required>
+            </div>
+
+            <!-- Senha -->
+            <div class="text-left text-gray-700 dark:text-gray-200 font-semibold">Senha</div>
+            <div class="flex items-center rounded-xl px-4 py-3 input-field">
+                <i data-lucide="lock" class="w-5 h-5 text-orange-500"></i>
+                <input type="password" th:field="*{senha}" placeholder="********"
+                       class="ml-3 flex-1 bg-transparent outline-none text-gray-700 dark:text-gray-100 placeholder-gray-400"
+                       required>
+            </div>
+
+            <!-- Botão -->
+            <button type="submit"
+                    class="btn-login text-white font-bold py-3 rounded-xl w-full transition active:scale-95">
+                Entrar
+            </button>
+        </form>
+
+        <!-- Links -->
+        <div class="mt-8 text-sm">
+            <p class="text-gray-700 dark:text-gray-300">
+                Não possui cadastro?
+                <a th:href="@{/cadastro}" class="text-orange-500 font-semibold hover:underline">
+                    Criar conta
+                </a>
+            </p>
+
+            <p class="mt-2 text-gray-600 dark:text-gray-400">
+                <a th:href="@{/}" class="hover:underline">Voltar ao início</a>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const toggleBtn = document.getElementById("toggleTheme");
+        const themeIcon = document.getElementById("themeIcon");
+
+        // Carregar tema salvo
+        if (localStorage.getItem("theme") === "dark") {
+            document.body.classList.replace("light", "dark");
+            themeIcon.setAttribute("data-lucide", "moon");
+            lucide.createIcons();
+        }
+
+        // Trocar tema
+        toggleBtn.addEventListener("click", () => {
+            if (document.body.classList.contains("light")) {
+                document.body.classList.replace("light", "dark");
+                themeIcon.setAttribute("data-lucide", "moon");
+                localStorage.setItem("theme", "dark");
+            } else {
+                document.body.classList.replace("dark", "light");
+                themeIcon.setAttribute("data-lucide", "sun");
+                localStorage.setItem("theme", "light");
+            }
+            lucide.createIcons();
+        });
+    </script>
+
+</body>
+</html>

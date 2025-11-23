@@ -1,47 +1,60 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>FoodStudy</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link 
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
             --primaria: #ff7a29;
             --branco: #fff;
             --texto: #f5f5f5;
+            --cinza-escuro: #222;
+            --cinza-claro: #777;
+            --bg-card: rgba(255, 255, 255, 0.08);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Poppins', sans-serif;
-            height: 100vh;
             background:
                 linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)),
                 url('https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg');
             background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
             color: var(--texto);
+        }
+
+        .hero {
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
 
         .container-app {
-            max-width: 380px;
+            max-width: 420px;
             text-align: center;
-            padding: 30px;
+            padding: 35px;
             backdrop-filter: blur(10px);
             background: rgba(255, 255, 255, 0.07);
             border-radius: 18px;
             border: 1px solid rgba(255,255,255,0.15);
+            animation: fadeIn 1.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .logo {
@@ -57,7 +70,6 @@
             margin-bottom: 25px;
         }
 
-        /* Botões premium */
         .btn-app {
             width: 100%;
             padding: 14px;
@@ -95,33 +107,167 @@
             opacity: 0.85;
             text-decoration: none;
         }
-
         .link-menor:hover {
             text-decoration: underline;
         }
+
+        .section {
+            padding: 80px 10%;
+            background: var(--cinza-escuro);
+            color: white;
+        }
+
+        .section h2 {
+            text-align: center;
+            font-size: 2.3rem;
+            margin-bottom: 40px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            padding: 25px;
+            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: transform .3s ease, background .3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-6px);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            color: #ccc;
+        }
+
+        .process {
+            padding: 80px 10%;
+            background: #111;
+        }
+
+        .process h2 {
+            text-align: center;
+            font-size: 2.3rem;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+        }
+
+        .step {
+            text-align: center;
+            padding: 25px;
+            border-radius: 16px;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .step-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primaria);
+        }
+
+        footer {
+            background: #000;
+            padding: 30px;
+            text-align: center;
+            color: #bbb;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: var(--primaria);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 
 <body>
 
-<div class="container-app">
+    <!-- HERO -->
+    <div class="hero">
+        <div class="container-app">
+            <div class="logo">FoodStudy</div>
+            <p class="subtitulo">Seu pedido na velocidade da sua rotina.</p>
 
-    <div class="logo">🍊 FoodStudy</div>
-    <p class="subtitulo">
-        Economia, sabor e sustentabilidade ao seu alcance.
-    </p>
+            <!-- BOTÕES CORRIGIDOS -->
+           <button class="btn-app btn-primario" onclick="window.location='/login'">Entrar</button>
 
-    <button class="btn-app btn-primario" onclick="location.href='/login.html'">
-        Entrar
-    </button>
+            <button class="btn-app btn-secundario" onclick="location.href='/cadastro'">Criar conta</button>
+            <a class="link-menor" href="/produtos-lista">Continuar sem login</a>
+        </div>
+    </div>
 
-    <button class="btn-app btn-secundario" onclick="location.href='/cadastro.html'">
-        Criar conta
-    </button>
+    <!-- POR QUE USAR -->
+    <section class="section">
+        <h2>Por que usar o FoodStudy?</h2>
 
-    <a class="link-menor" href="/produtos.html">Continuar sem login</a>
+        <div class="features">
+            <div class="feature-card">
+                <h3>💰 Economia real</h3>
+                <p>Descontos exclusivos e refeições de qualidade com preços reduzidos.</p>
+            </div>
 
-</div>
+            <div class="feature-card">
+                <h3>♻️ Evite desperdício</h3>
+                <p>Aproveite alimentos excedentes de estabelecimentos parceiros.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>⚡ Prático e rápido</h3>
+                <p>Faça pedidos rapidamente com poucos cliques.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMO FUNCIONA -->
+    <section class="process">
+        <h2>Como funciona?</h2>
+
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <p>Encontre ofertas em estabelecimentos próximos.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <p>Escolha a refeição e reserve seu pedido.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <p>Retire no horário marcado e aproveite.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        © 2025 FoodStudy • Desenvolvido com dedicação 🍊  
+        <br> <a href="#">Política de Privacidade</a> • <a href="#">Termos de Uso</a>
+    </footer>
 
 </body>
 </html>

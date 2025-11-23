@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home - FoodStudy</title>
+</head>
+<body>
+<h1>Home FoodStudy</h1>
+
+<p th:if="${session.usuarioLogado != null}">
+    Bem-vindo,
+    <strong th:text="${session.usuarioLogado.nome}">Usuário</strong>!
+</p>
+
+<p th:if="${session.usuarioLogado == null}">
+    Você entrou sem login.
+</p>
+
+<p>
+    Aqui depois você coloca a listagem de estabelecimentos, pedidos, etc.
+</p>
+
+<p>
+    <a th:href="@{/}">Sair para tela inicial</a>
+</p>
+</body>
+</html>

@@ -1,48 +1,20 @@
 package com.foodstudy.web.controller;
 
-import com.foodstudy.web.model.Produto;
-import com.foodstudy.web.service.ProdutoService;
-import org.springframework.web.bind.annotation.*;
+import com.foodstudy.web.repository.ProdutoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.List;
-
-@RestController
-@RequestMapping("/produtos")
+@Controller
 public class ProdutoController {
 
-    private final ProdutoService produtoService;
+    @Autowired
+    private ProdutoRepository repo;
 
-    public ProdutoController(ProdutoService produtoService) {
-        this.produtoService = produtoService;
-    }
-
-    // 1. Listar todos os produtos
-    @GetMapping
-    public List<Produto> listar() {
-        return produtoService.listarTodos();
-    }
-
-    // 2. Buscar produto por ID
-    @GetMapping("/{id}")
-    public Produto buscarPorId(@PathVariable Long id) {
-        return produtoService.buscarPorId(id);
-    }
-
-    // 3. Cadastrar produto
-    @PostMapping
-    public Produto cadastrar(@RequestBody Produto produto) {
-        return produtoService.salvar(produto);
-    }
-
-    // 4. Atualizar produto
-    @PutMapping("/{id}")
-    public Produto atualizar(@PathVariable Long id, @RequestBody Produto dados) {
-        return produtoService.atualizar(id, dados);
-    }
-
-    // 5. Deletar produto
-    @DeleteMapping("/{id}")
-    public void deletar(@PathVariable Long id) {
-        produtoService.deletar(id);
+    @GetMapping("/produtos-lista")   // <<< ALTERADO PARA ACABAR COM ERRO
+    public String listar(Model model) {
+        model.addAttribute("produtos", repo.findAll());
+        return "produtos";  // produtos.html
     }
 }
