@@ -4,6 +4,12 @@
 
 const API_URL = "";
 const STORAGE_USER_KEY = "foodstudy_user";
+const SAMPLE_CART_ITEMS = [
+    { nome: "Sanduíche natural", preco: 12.5, quantidade: 1 },
+    { nome: "Suco de laranja 300ml", preco: 8, quantidade: 2 },
+    { nome: "Salada fresca", preco: 14, quantidade: 1 }
+];
+let cartItems = [...SAMPLE_CART_ITEMS];
 
 /* -----------------------------------------------------
    HELPERS DE API
@@ -61,6 +67,12 @@ function setStoredUser(usuario) {
     );
 }
 
+function getInitials(nome = "") {
+    const parts = nome.trim().split(/\s+/).filter(Boolean).slice(0, 2);
+    if (!parts.length) return "US";
+    return parts.map((p) => p.charAt(0).toUpperCase()).join("");
+}
+
 function getCurrentUserId() {
     const stored = getStoredUser();
     if (stored?.id) return stored.id;
@@ -74,6 +86,116 @@ function refreshIcons() {
     if (window.lucide) {
         lucide.createIcons();
     }
+}
+
+async function initAuthUI() {
+    const loginLink = document.getElementById("login-link");
+    const logoutButton = document.getElementById("logout-button");
+    const navUser = document.getElementById("nav-user-box");
+    const navUserName = document.getElementById("nav-user-name");
+    const navUserAvatar = document.getElementById("nav-user-avatar");
+    const saldoTop = document.getElementById("saldo-top");
+
+    const updateLogoutListener = () => {
+        if (logoutButton && !logoutButton.dataset.bound) {
+            logoutButton.dataset.bound = "true";
+            logoutButton.addEventListener("click", () => {
+                localStorage.removeItem(STORAGE_USER_KEY);
+                window.location.href = "/login.html";
+            });
+        }
+    };
+
+    const stored = getStoredUser();
+
+    if (!stored) {
+        loginLink?.classList.remove("hidden");
+        logoutButton?.classList.add("hidden");
+        navUser?.classList.add("hidden");
+        if (saldoTop) saldoTop.textContent = "0,00";
+        return;
+    }
+
+    loginLink?.classList.add("hidden");
+    logoutButton?.classList.remove("hidden");
+    navUser?.classList.remove("hidden");
+    navUserName && (navUserName.textContent = stored.nome || "Usuário");
+    navUserAvatar && (navUserAvatar.textContent = getInitials(stored.nome));
+
+    updateLogoutListener();
+
+    try {
+        const usuario = await apiGet(`/usuarios/${stored.id}`);
+        setStoredUser(usuario);
+        if (saldoTop) {
+            const saldo = Number(usuario.foodCash?.saldo ?? 0).toFixed(2);
+            saldoTop.textContent = saldo;
+        }
+        if (navUserName) navUserName.textContent = usuario.nome || navUserName.textContent;
+        if (navUserAvatar) navUserAvatar.textContent = getInitials(usuario.nome);
+    } catch (err) {
+        console.warn("Não foi possível atualizar usuário", err);
+    }
+}
+
+function renderCart(items, listEl, totalEl) {
+    if (!listEl || !totalEl) return;
+
+    if (!items.length) {
+        listEl.innerHTML = "<li class=\"mini-label\">Seu carrinho está vazio.</li>";
+        totalEl.textContent = "R$ 0,00";
+        return;
+    }
+
+    listEl.innerHTML = "";
+    let total = 0;
+
+    items.forEach((item) => {
+        const preco = Number(item.preco || 0) * (item.quantidade || 1);
+        total += preco;
+        listEl.innerHTML += `
+            <li class="cart-item">
+                <div class="info">
+                    <p class="mini-value">${item.nome}</p>
+                    <p class="mini-label">${item.quantidade}x • R$ ${Number(item.preco || 0).toFixed(2)}</p>
+                </div>
+                <strong>R$ ${preco.toFixed(2)}</strong>
+            </li>
+        `;
+    });
+
+    totalEl.textContent = `R$ ${total.toFixed(2)}`;
+}
+
+function initCartModal() {
+    const modal = document.getElementById("cart-modal");
+    const overlay = document.getElementById("cart-overlay");
+    const listEl = document.getElementById("cart-items");
+    const totalEl = document.getElementById("cart-total");
+    const countEl = document.getElementById("cart-count");
+
+    if (!modal || !overlay) return;
+
+    const openCart = () => {
+        modal.classList.add("open");
+        overlay.classList.add("open");
+    };
+
+    const closeCart = () => {
+        modal.classList.remove("open");
+        overlay.classList.remove("open");
+    };
+
+    document.querySelectorAll("[data-cart-open]").forEach((btn) =>
+        btn.addEventListener("click", openCart)
+    );
+    document.querySelectorAll("[data-cart-close]").forEach((btn) =>
+        btn.addEventListener("click", closeCart)
+    );
+    overlay.addEventListener("click", closeCart);
+
+    renderCart(cartItems, listEl, totalEl);
+    if (countEl) countEl.textContent = cartItems.length;
 }
 
 /* -----------------------------------------------------
@@ -437,6 +559,9 @@ async function initPaginaHome() {
 ------------------------------------------------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
+    initAuthUI();
+    initCartModal();
+
     const page = document.body.dataset.page;
 
     switch (page) {

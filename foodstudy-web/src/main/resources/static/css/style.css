@@ -63,6 +63,8 @@ body.landing-body {
     font-weight: 700;
     color: #fff;
     margin-bottom: 10px;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .subtitulo {
@@ -131,6 +133,13 @@ body.landing-body {
     gap: 10px;
 }
 
+.logo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
 .logo-badge {
     width: 36px;
     height: 36px;
@@ -175,6 +184,30 @@ body.landing-body {
     align-items: center;
     gap: 12px;
     font-size: 13px;
+}
+
+.auth-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-actions a {
+    color: var(--purple-dark);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.link-button {
+    background: transparent;
+    border: none;
+    color: var(--texto-muted);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.hidden {
+    display: none !important;
 }
 
 .pill-top {
@@ -659,6 +692,123 @@ th {
     font-size: 14px;
     color: var(--purple-dark);
     text-decoration: none;
+}
+
+/* -----------------------------------------------------
+   CARRINHO
+------------------------------------------------------ */
+
+.cart-trigger {
+    position: relative;
+}
+
+.badge-counter {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
+    color: #fff;
+    border-radius: 999px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.2s ease;
+    z-index: 80;
+}
+
+.cart-modal {
+    position: fixed;
+    right: 24px;
+    top: 90px;
+    width: 360px;
+    max-width: 90vw;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.16);
+    padding: 18px;
+    z-index: 90;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: 0.25s ease;
+}
+
+.cart-modal.open,
+.modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cart-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 10px 0;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.cart-item .info {
+    flex: 1;
+}
+
+.cart-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 700;
+}
+
+.cart-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-text {
+    background: transparent;
+    border: none;
+    color: var(--texto-muted);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* -----------------------------------------------------
+   RODAPÉ
+------------------------------------------------------ */
+
+.app-footer {
+    background: #0f172a;
+    color: #e5e7eb;
+    text-align: center;
+    padding: 16px 12px;
+    font-size: 13px;
 }
 
 @media (max-width: 900px) {
