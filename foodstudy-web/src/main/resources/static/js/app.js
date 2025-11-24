@@ -3,6 +3,13 @@
 ------------------------------------------------------ */
 
 const API_URL = "";
+const STORAGE_USER_KEY = "foodstudy_user";
+const SAMPLE_CART_ITEMS = [
+    { nome: "Sanduíche natural", preco: 12.5, quantidade: 1 },
+    { nome: "Suco de laranja 300ml", preco: 8, quantidade: 2 },
+    { nome: "Salada fresca", preco: 14, quantidade: 1 }
+];
+let cartItems = [...SAMPLE_CART_ITEMS];
 
 /* -----------------------------------------------------
    HELPERS DE API
@@ -19,7 +26,7 @@ async function apiRequest(method, endpoint, body) {
         options.body = JSON.stringify(body);
     }
 
-    const resp = await fetch(`${API_URL}${endpoint}`);
+    const resp = await fetch(`${API_URL}${endpoint}`, options);
 
     if (!resp.ok) {
         const msg = await resp.text().catch(() => "");
@@ -42,15 +49,153 @@ function apiPost(endpoint, body) {
    UTILITÁRIOS
 ------------------------------------------------------ */
 
-function getUserIdFromQuery() {
+function getStoredUser() {
+    const raw = localStorage.getItem(STORAGE_USER_KEY);
+    if (!raw) return null;
+    try {
+        return JSON.parse(raw);
+    } catch (err) {
+        console.warn("Não foi possível ler o usuário salvo", err);
+        return null;
+    }
+}
+
+function setStoredUser(usuario) {
+    localStorage.setItem(
+        STORAGE_USER_KEY,
+        JSON.stringify({ id: usuario.id, nome: usuario.nome, cpf: usuario.cpf })
+    );
+}
+
+function getInitials(nome = "") {
+    const parts = nome.trim().split(/\s+/).filter(Boolean).slice(0, 2);
+    if (!parts.length) return "US";
+    return parts.map((p) => p.charAt(0).toUpperCase()).join("");
+}
+
+function getCurrentUserId() {
+    const stored = getStoredUser();
+    if (stored?.id) return stored.id;
+
     const params = new URLSearchParams(window.location.search);
-    return params.get("usuario");
+    const queryUser = params.get("usuario");
+    return queryUser || 1;
 }
 
 function refreshIcons() {
     if (window.lucide) {
         lucide.createIcons();
     }
+}
+
+async function initAuthUI() {
+    const loginLink = document.getElementById("login-link");
+    const logoutButton = document.getElementById("logout-button");
+    const navUser = document.getElementById("nav-user-box");
+    const navUserName = document.getElementById("nav-user-name");
+    const navUserAvatar = document.getElementById("nav-user-avatar");
+    const saldoTop = document.getElementById("saldo-top");
+
+    const updateLogoutListener = () => {
+        if (logoutButton && !logoutButton.dataset.bound) {
+            logoutButton.dataset.bound = "true";
+            logoutButton.addEventListener("click", () => {
+                localStorage.removeItem(STORAGE_USER_KEY);
+                window.location.href = "/login.html";
+            });
+        }
+    };
+
+    const stored = getStoredUser();
+
+    if (!stored) {
+        loginLink?.classList.remove("hidden");
+        logoutButton?.classList.add("hidden");
+        navUser?.classList.add("hidden");
+        if (saldoTop) saldoTop.textContent = "0,00";
+        return;
+    }
+
+    loginLink?.classList.add("hidden");
+    logoutButton?.classList.remove("hidden");
+    navUser?.classList.remove("hidden");
+    navUserName && (navUserName.textContent = stored.nome || "Usuário");
+    navUserAvatar && (navUserAvatar.textContent = getInitials(stored.nome));
+
+    updateLogoutListener();
+
+    try {
+        const usuario = await apiGet(`/usuarios/${stored.id}`);
+        setStoredUser(usuario);
+        if (saldoTop) {
+            const saldo = Number(usuario.foodCash?.saldo ?? 0).toFixed(2);
+            saldoTop.textContent = saldo;
+        }
+        if (navUserName) navUserName.textContent = usuario.nome || navUserName.textContent;
+        if (navUserAvatar) navUserAvatar.textContent = getInitials(usuario.nome);
+    } catch (err) {
+        console.warn("Não foi possível atualizar usuário", err);
+    }
+}
+
+function renderCart(items, listEl, totalEl) {
+    if (!listEl || !totalEl) return;
+
+    if (!items.length) {
+        listEl.innerHTML = "<li class=\"mini-label\">Seu carrinho está vazio.</li>";
+        totalEl.textContent = "R$ 0,00";
+        return;
+    }
+
+    listEl.innerHTML = "";
+    let total = 0;
+
+    items.forEach((item) => {
+        const preco = Number(item.preco || 0) * (item.quantidade || 1);
+        total += preco;
+        listEl.innerHTML += `
+            <li class="cart-item">
+                <div class="info">
+                    <p class="mini-value">${item.nome}</p>
+                    <p class="mini-label">${item.quantidade}x • R$ ${Number(item.preco || 0).toFixed(2)}</p>
+                </div>
+                <strong>R$ ${preco.toFixed(2)}</strong>
+            </li>
+        `;
+    });
+
+    totalEl.textContent = `R$ ${total.toFixed(2)}`;
+}
+
+function initCartModal() {
+    const modal = document.getElementById("cart-modal");
+    const overlay = document.getElementById("cart-overlay");
+    const listEl = document.getElementById("cart-items");
+    const totalEl = document.getElementById("cart-total");
+    const countEl = document.getElementById("cart-count");
+
+    if (!modal || !overlay) return;
+
+    const openCart = () => {
+        modal.classList.add("open");
+        overlay.classList.add("open");
+    };
+
+    const closeCart = () => {
+        modal.classList.remove("open");
+        overlay.classList.remove("open");
+    };
+
+    document.querySelectorAll("[data-cart-open]").forEach((btn) =>
+        btn.addEventListener("click", openCart)
+    );
+    document.querySelectorAll("[data-cart-close]").forEach((btn) =>
+        btn.addEventListener("click", closeCart)
+    );
+    overlay.addEventListener("click", closeCart);
+
+    renderCart(cartItems, listEl, totalEl);
+    if (countEl) countEl.textContent = cartItems.length;
 }
 
 /* -----------------------------------------------------
@@ -202,13 +347,14 @@ async function initPaginaPlanos() {
 ------------------------------------------------------ */
 
 async function initPaginaMinhaConta() {
-    const userId = getUserIdFromQuery() || 1;
+    const userId = getCurrentUserId();
     const spanNome = document.getElementById("conta-nome");
     const spanSaldo = document.getElementById("conta-saldo");
     const botaoAdd = document.getElementById("btn-add-saldo");
 
     try {
         const usuario = await apiGet(`/usuarios/${userId}`);
+        setStoredUser(usuario);
         spanNome.textContent = usuario.nome || `Usuário #${userId}`;
         const saldo = usuario.foodCash?.saldo ?? 0;
         spanSaldo.textContent = Number(saldo).toFixed(2);
@@ -247,7 +393,7 @@ async function initPaginaPedidos() {
     const tabela = document.getElementById("tabela-pedidos");
     if (!tabela) return;
 
-    const userId = getUserIdFromQuery() || 1;
+    const userId = getCurrentUserId();
 
     try {
         const pedidos = await apiGet(`/usuarios/${userId}/pedidos`);
@@ -303,10 +449,119 @@ function initPaginaCadastroUsuario() {
 }
 
 /* -----------------------------------------------------
+   LOGIN
+------------------------------------------------------ */
+
+function initPaginaLogin() {
+    const form = document.getElementById("form-login");
+    if (!form) return;
+
+    const errorBox = document.getElementById("login-error");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (errorBox) errorBox.textContent = "";
+
+        const nome = form.nome.value.trim();
+        const cpf = form.cpf.value.trim();
+
+        try {
+            const usuario = await apiPost("/usuarios/login", { nome, cpf });
+            setStoredUser(usuario);
+            window.location.href = "/home.html";
+        } catch (err) {
+            console.error(err);
+            if (errorBox) {
+                errorBox.textContent = "Não foi possível entrar. Confira o CPF e tente novamente.";
+            }
+        }
+    });
+}
+
+/* -----------------------------------------------------
+   HOME
+------------------------------------------------------ */
+
+async function initPaginaHome() {
+    const saudacao = document.getElementById("home-saudacao");
+    const saldoSpan = document.getElementById("home-saldo");
+    const estabsLista = document.getElementById("home-estabs");
+    const planosLista = document.getElementById("home-planos");
+
+    const stored = getStoredUser();
+
+    if (stored) {
+        try {
+            const usuario = await apiGet(`/usuarios/${stored.id}`);
+            setStoredUser(usuario);
+            if (saudacao) {
+                saudacao.textContent = `Olá, ${usuario.nome || "estudante"}`;
+            }
+            if (saldoSpan) {
+                saldoSpan.textContent = Number(usuario.foodCash?.saldo ?? 0).toFixed(2);
+            }
+        } catch (err) {
+            console.warn("Falha ao atualizar usuário", err);
+        }
+    }
+
+    if (estabsLista) {
+        try {
+            const estabs = await apiGet("/estabelecimentos");
+            estabsLista.innerHTML = "";
+            estabs.slice(0, 3).forEach((est) => {
+                estabsLista.innerHTML += `
+                    <div class="card-mini">
+                        <div class="card-icon mini">
+                            <i data-lucide="store"></i>
+                        </div>
+                        <div>
+                            <p class="mini-label">Restaurante</p>
+                            <p class="mini-value">${est.nome}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (err) {
+            console.error(err);
+            estabsLista.innerHTML = "<p class=\"erro-inline\">Não foi possível carregar estabelecimentos.</p>";
+        }
+    }
+
+    if (planosLista) {
+        try {
+            const planos = await apiGet("/assinaturas");
+            planosLista.innerHTML = "";
+            planos.forEach((plano) => {
+                planosLista.innerHTML += `
+                    <div class="card-mini">
+                        <div class="card-icon mini purple">
+                            <i data-lucide="badge-dollar-sign"></i>
+                        </div>
+                        <div>
+                            <p class="mini-label">${plano.tipo}</p>
+                            <p class="mini-value">R$ ${Number(plano.valor || 0).toFixed(2)}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (err) {
+            console.error(err);
+            planosLista.innerHTML = "<p class=\"erro-inline\">Planos indisponíveis no momento.</p>";
+        }
+    }
+
+    refreshIcons();
+}
+
+/* -----------------------------------------------------
    ROTEADOR POR PÁGINA
 ------------------------------------------------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
+    initAuthUI();
+    initCartModal();
+
     const page = document.body.dataset.page;
 
     switch (page) {
@@ -318,6 +573,12 @@ document.addEventListener("DOMContentLoaded", () => {
             break;
         case "planos":
             initPaginaPlanos();
+            break;
+        case "home":
+            initPaginaHome();
+            break;
+        case "login":
+            initPaginaLogin();
             break;
         case "conta":
             initPaginaMinhaConta();
